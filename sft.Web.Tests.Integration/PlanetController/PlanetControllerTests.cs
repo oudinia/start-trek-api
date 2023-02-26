@@ -20,16 +20,19 @@ public class PlanetControllerTests : IClassFixture<WebApplicationFactory<IApiMar
     public async Task TestInitialCountOfPlanetsIsFifteen()
     {
         // Arrange
-        var client = _apiFactory.CreateClient();
-        var expectedPlanetCount = 15;
+        var client = GivenDefaultHttpClient();
+        var expectedPlanetCount = Utilities.GivenExpectedCount(15);
         
         // Act
-        var planetsResponse = await client.GetAsync("api/planets");
-        var response = await planetsResponse.Content.ReadAsStringAsync();
-        var planets = JsonSerializer.Deserialize<Planet[]>(response);
+        var planets =  await Utilities.WhenGetSerializedResponse<Planet>("api/planets", client);
 
         // Assert
         var actualPlanetCount = planets?.Length;
         Assert.True(Equals(actualPlanetCount, expectedPlanetCount));
+    }
+
+    private HttpClient GivenDefaultHttpClient() 
+    {
+        return _apiFactory.CreateClient();
     }
 }
